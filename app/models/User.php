@@ -18,7 +18,7 @@ class User {
       return $rows;
     }
 
-    public function authenticate($username, $password) {
+    public function authenticate($username, $password, $log) {
         /*
          * if username and password good then
          * $this->auth = true;
@@ -33,13 +33,19 @@ class User {
     		if (password_verify($password, $rows['password'])) {
     			$_SESSION['auth'] = 1;
     			$_SESSION['username'] = ucwords($username);
+
+
+          $log->createLog($username, 'good');
     			unset($_SESSION['failedAuth']);
+          unset($_SESSION['failedTime']);
     			header('Location: /home');
     			die;
     		} else {
+          $log->createLog($username, 'bad');
+          $_SESSION['failedTime'] = time();
     			if(isset($_SESSION['failedAuth'])) {
     				$_SESSION['failedAuth'] ++; //increment
-    			} else {
+          } else {
     				$_SESSION['failedAuth'] = 1;
     			}
     			header('Location: /login');
